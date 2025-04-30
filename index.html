@@ -114,6 +114,37 @@
             border-radius: 8px;
             margin-top: 20px;
         }
+        
+        /* Стили для кнопки закрытия клавиатуры */
+        .keyboard-done-btn {
+            position: fixed;
+            bottom: 75px;
+            right: 16px;
+            background-color: var(--tg-theme-button-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Затемнение для закрытия клавиатуры */
+        .keyboard-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.01);
+            z-index: 90;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -152,7 +183,17 @@
         </div>
     </div>
 
+    <!-- Кнопка отправки формы -->
     <div class="submit-btn" id="submitButton">Отправить</div>
+    
+    <!-- Кнопка для закрытия клавиатуры -->
+    <div class="keyboard-done-btn" id="keyboardDoneBtn">✓</div>
+    
+    <!-- Фоновый элемент для закрытия клавиатуры при тапе -->
+    <div class="keyboard-backdrop" id="keyboardBackdrop"></div>
+    
+    <!-- Скрытые поля для нативного ввода (хак для iOS) -->
+    <input type="text" id="hiddenInput" style="position: absolute; opacity: 0; height: 0; top: -999px;">
 
     <script>
         // Инициализация Telegram WebApp
@@ -169,12 +210,20 @@
         // Получаем элементы формы
         const editableFields = document.querySelectorAll('.editable-field');
         const submitButton = document.getElementById('submitButton');
-
+        const keyboardDoneBtn = document.getElementById('keyboardDoneBtn');
+        const keyboardBackdrop = document.getElementById('keyboardBackdrop');
+        const hiddenInput = document.getElementById('hiddenInput');
+        
+        // Определяем, используется ли iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
         // Функция для проверки, заполнены ли все обязательные поля
         function validateForm() {
             let isValid = true;
             editableFields.forEach(field => {
-                if (field.getAttribute('data-required') === 'true' && field.textContent.trim() === '') {
+                if (field.getAttribute('data-required') === 'true' && 
+                    (field.textContent.trim() === '' || 
+                     field.textContent.trim() === field.getAttribute('data-placeholder'))) {
                     isValid = false;
                     field.style.borderColor = 'red';
                 } else {
@@ -182,6 +231,26 @@
                 }
             });
             return isValid;
+        }
+        
+        // Функция для скрытия клавиатуры на iOS
+        function hideKeyboard() {
+            if (isIOS) {
+                // Хак для iOS - фокусируемся на скрытое поле и сразу скрываем его
+                hiddenInput.focus();
+                setTimeout(() => {
+                    hiddenInput.blur();
+                    keyboardDoneBtn.style.display = 'none';
+                    keyboardBackdrop.style.display = 'none';
+                }, 50);
+            } else {
+                // Для других платформ просто снимаем фокус с активного элемента
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+                keyboardDoneBtn.style.display = 'none';
+                keyboardBackdrop.style.display = 'none';
+            }
         }
 
         // Добавляем обработчики событий для полей ввода
@@ -196,6 +265,10 @@
                     this.textContent = '';
                 }
                 this.classList.add('with-content');
+                
+                // Показываем кнопку закрытия клавиатуры и фон
+                keyboardDoneBtn.style.display = 'flex';
+                keyboardBackdrop.style.display = 'block';
             });
             
             // Обработчик потери фокуса
@@ -210,16 +283,37 @@
             
             // Обработчик ввода для проверки заполненности
             field.addEventListener('input', function() {
-                if (this.textContent.trim() !== '') {
+                if (this.textContent.trim() !== '' && 
+                    this.textContent.trim() !== this.getAttribute('data-placeholder')) {
                     this.classList.add('with-content');
                 } else {
                     this.classList.remove('with-content');
                 }
             });
+            
+            // Обработчик для клавиши Enter - закрываем клавиатуру
+            field.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    // Только для однострочных полей
+                    if (field.getAttribute('data-multiline') !== 'true') {
+                        e.preventDefault();
+                        hideKeyboard();
+                    }
+                }
+            });
         });
+
+        // Обработчик для кнопки закрытия клавиатуры
+        keyboardDoneBtn.addEventListener('click', hideKeyboard);
+        
+        // Обработчик для фона закрытия клавиатуры
+        keyboardBackdrop.addEventListener('click', hideKeyboard);
 
         // Обработчик нажатия на кнопку "Отправить"
         submitButton.addEventListener('click', function() {
+            // Закрываем клавиатуру, если она открыта
+            hideKeyboard();
+            
             if (!validateForm()) {
                 tg.showAlert('Пожалуйста, заполните все обязательные поля.');
                 return;
@@ -258,7 +352,7 @@
             const placeholder = field.getAttribute('data-placeholder');
             const value = field.textContent.trim();
             
-            return value === placeholder ? '' : value;
+            return (value === placeholder) ? '' : value;
         }
 
         // Применяем тему Telegram
