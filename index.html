@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма курса</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/telegram-web-app/6.7.0/telegram-web-app.js"></script>
     <style>
@@ -23,13 +23,13 @@
             margin: 0;
             padding: 0;
             font-size: 16px;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
             padding: 16px;
             max-width: 500px;
             margin: 0 auto;
+            padding-bottom: 80px; /* Дополнительный отступ внизу */
         }
 
         .form-group {
@@ -70,35 +70,6 @@
             resize: vertical;
         }
 
-        .form-display {
-            width: 100%;
-            background-color: var(--tg-theme-secondary-bg-color);
-            color: var(--tg-theme-text-color);
-            border: none;
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-size: 16px;
-            box-sizing: border-box;
-            min-height: 48px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .form-display::after {
-            content: "📝";
-            font-size: 20px;
-        }
-
-        .form-display.with-value {
-            color: var(--tg-theme-text-color);
-        }
-
-        .form-display.empty {
-            color: var(--tg-theme-hint-color);
-        }
-
         .submit-btn {
             width: 100%;
             background-color: var(--tg-theme-button-color);
@@ -110,6 +81,13 @@
             font-weight: 500;
             cursor: pointer;
             transition: opacity 0.2s;
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            max-width: calc(500px - 32px);
+            margin: 0 auto;
+            z-index: 100;
         }
 
         .submit-btn:hover {
@@ -129,65 +107,16 @@
             margin-top: 20px;
         }
 
-        /* Модальное окно для ввода */
-        .modal {
-            display: none;
+        /* Затемнение над кнопкой */
+        .button-fade {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            flex-direction: column;
-        }
-
-        .modal-content {
-            background-color: var(--tg-theme-bg-color);
-            margin: auto;
-            width: 100%;
-            padding: 20px;
-            border-radius: 12px 12px 0 0;
-            max-width: 100%;
-            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--tg-theme-hint-color);
-            cursor: pointer;
-        }
-
-        .save-btn {
-            width: 100%;
-            background-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            margin-top: 16px;
+            height: 80px;
+            background: linear-gradient(to bottom, rgba(28, 34, 43, 0), rgba(28, 34, 43, 1));
+            pointer-events: none;
+            z-index: 90;
         }
     </style>
 </head>
@@ -195,35 +124,33 @@
     <div class="container">
         <form id="courseForm">
             <div class="form-group">
-                <label for="courseTopicDisplay" class="form-label">Тема курса</label>
-                <div id="courseTopicDisplay" class="form-display empty" data-target="courseTopic">Напишите тему, которую вы бы хотели изучить</div>
+                <label for="courseTopic" class="form-label">Тема курса</label>
+                <input type="text" id="courseTopic" class="form-input" placeholder="Напишите тему, которую вы бы хотели изучить" required>
                 <span class="form-hint">Напишите тему, которую вы бы хотели изучить</span>
             </div>
 
             <div class="form-group">
-                <label for="subjectAreaDisplay" class="form-label">Предметная область</label>
-                <div id="subjectAreaDisplay" class="form-display empty" data-target="subjectArea">Укажите область необходимых знаний</div>
+                <label for="subjectArea" class="form-label">Предметная область</label>
+                <input type="text" id="subjectArea" class="form-input" placeholder="Укажите область необходимых знаний" required>
                 <span class="form-hint">Укажите область необходимых знаний, к примеру, курс по теории вероятности может применяться для математических задач, для экономических задач или для программирования</span>
             </div>
 
             <div class="form-group">
-                <label for="knowledgeLevelDisplay" class="form-label">Уровень знаний для курса</label>
-                <div id="knowledgeLevelDisplay" class="form-display empty" data-target="knowledgeLevel">Укажите необходимый уровень сложности курса</div>
+                <label for="knowledgeLevel" class="form-label">Уровень знаний для курса</label>
+                <input type="text" id="knowledgeLevel" class="form-input" placeholder="Укажите необходимый уровень сложности курса" required>
                 <span class="form-hint">Укажите необходимый уровень сложности курса</span>
             </div>
 
             <div class="form-group">
-                <label for="learningGoalDisplay" class="form-label">Цель обучения</label>
-                <div id="learningGoalDisplay" class="form-display empty" data-target="learningGoal">Укажите для каких целей вам нужен курс</div>
+                <label for="learningGoal" class="form-label">Цель обучения</label>
+                <input type="text" id="learningGoal" class="form-input" placeholder="Укажите для каких целей вам нужен курс" required>
                 <span class="form-hint">Укажите для каких целей вам нужен курс, например, для личного развития / для решения рабочих задач</span>
             </div>
 
             <div class="form-group">
-                <label for="additionalCommentsDisplay" class="form-label">Дополнительные комментарии</label>
-                <div id="additionalCommentsDisplay" class="form-display empty" data-target="additionalComments">Дополнительная информация (необязательно)</div>
+                <label for="additionalComments" class="form-label">Дополнительные комментарии</label>
+                <textarea id="additionalComments" class="form-input" placeholder="Дополнительная информация (необязательно)"></textarea>
             </div>
-
-            <button type="submit" class="submit-btn">Отправить</button>
         </form>
 
         <div id="successMessage" class="success-message">
@@ -231,116 +158,17 @@
         </div>
     </div>
 
-    <!-- Скрытые поля для хранения значений -->
-    <input type="hidden" id="courseTopic" value="">
-    <input type="hidden" id="subjectArea" value="">
-    <input type="hidden" id="knowledgeLevel" value="">
-    <input type="hidden" id="learningGoal" value="">
-    <input type="hidden" id="additionalComments" value="">
-
-    <!-- Модальное окно для ввода -->
-    <div id="inputModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Введите значение</h3>
-                <button type="button" class="close-modal" id="closeModal">×</button>
-            </div>
-            <div>
-                <input type="text" id="modalInput" class="form-input">
-                <button type="button" class="save-btn" id="saveInput">Сохранить</button>
-            </div>
-        </div>
-    </div>
+    <!-- Затемнение над кнопкой -->
+    <div class="button-fade"></div>
+    
+    <!-- Кнопка отправки, вынесенная за пределы прокрутки -->
+    <button id="submitButton" class="submit-btn">Отправить</button>
 
     <script>
         // Initialize Telegram WebApp
         const webApp = window.Telegram.WebApp;
         webApp.expand();
         webApp.ready();
-
-        // Получаем элементы DOM
-        const displayFields = document.querySelectorAll('.form-display');
-        const inputModal = document.getElementById('inputModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalInput = document.getElementById('modalInput');
-        const saveInputBtn = document.getElementById('saveInput');
-        const closeModalBtn = document.getElementById('closeModal');
-        
-        let currentTargetField = null;
-
-        // Обработчик клика по дисплейным полям
-        displayFields.forEach(field => {
-            field.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const targetField = document.getElementById(targetId);
-                const fieldLabel = this.closest('.form-group').querySelector('.form-label').textContent;
-                
-                currentTargetField = targetId;
-                modalTitle.textContent = fieldLabel;
-                modalInput.value = targetField.value;
-                
-                // Показываем модальное окно
-                inputModal.style.display = 'flex';
-                
-                // Устанавливаем таймаут, чтобы дать время браузеру отрисовать модальное окно
-                setTimeout(() => {
-                    modalInput.focus();
-                }, 100);
-            });
-        });
-
-        // Сохранение введенного значения
-        saveInputBtn.addEventListener('click', function() {
-            saveInputValue();
-        });
-        
-        // Обработчик Enter в модальном окне
-        modalInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                saveInputValue();
-            }
-        });
-        
-        // Закрытие модального окна
-        closeModalBtn.addEventListener('click', function() {
-            inputModal.style.display = 'none';
-        });
-        
-        // При клике вне модального окна - закрываем его
-        inputModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                inputModal.style.display = 'none';
-            }
-        });
-        
-        // Функция сохранения введенного значения
-        function saveInputValue() {
-            if (!currentTargetField) return;
-            
-            const value = modalInput.value.trim();
-            const targetField = document.getElementById(currentTargetField);
-            const displayField = document.getElementById(currentTargetField + 'Display');
-            
-            // Сохраняем значение и обновляем отображение
-            targetField.value = value;
-            
-            if (value) {
-                displayField.textContent = value;
-                displayField.classList.remove('empty');
-                displayField.classList.add('with-value');
-            } else {
-                // Если значение пустое, возвращаем placeholder
-                const placeholder = displayField.getAttribute('data-placeholder') || 
-                                   displayField.closest('.form-group').querySelector('.form-hint').textContent.split('.')[0];
-                displayField.textContent = placeholder;
-                displayField.classList.add('empty');
-                displayField.classList.remove('with-value');
-            }
-            
-            // Закрываем модальное окно
-            inputModal.style.display = 'none';
-        }
 
         // Apply Telegram theme to our custom variables if available
         document.addEventListener('DOMContentLoaded', function() {
@@ -352,20 +180,36 @@
                 document.documentElement.style.setProperty('--tg-theme-button-color', webApp.themeParams.button_color || '#5288c1');
                 document.documentElement.style.setProperty('--tg-theme-button-text-color', webApp.themeParams.button_text_color || '#ffffff');
                 document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', webApp.themeParams.secondary_bg_color || '#131820');
+                
+                // Обновляем цвет градиента в соответствии с темой
+                const bgColor = webApp.themeParams.bg_color || '#1c222b';
+                document.querySelector('.button-fade').style.background = `linear-gradient(to bottom, ${bgColor}00, ${bgColor})`;
             }
-            
-            // Инициализируем placeholder тексты
-            displayFields.forEach(field => {
-                const placeholder = field.textContent;
-                field.setAttribute('data-placeholder', placeholder);
-            });
         });
 
-        // Form submission handler
-        document.getElementById('courseForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Обработчик отправки формы (вне самой формы)
+        document.getElementById('submitButton').addEventListener('click', function() {
+            const form = document.getElementById('courseForm');
             
-            // Get form values from hidden fields
+            // Проверяем валидность формы
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('invalid');
+                }
+            });
+            
+            if (!isValid) {
+                alert('Пожалуйста, заполните все обязательные поля');
+                return;
+            }
+            
+            // Get form values
             const formData = {
                 courseTopic: document.getElementById('courseTopic').value,
                 subjectArea: document.getElementById('subjectArea').value,
@@ -374,18 +218,14 @@
                 additionalComments: document.getElementById('additionalComments').value
             };
             
-            // Проверка обязательных полей
-            if (!formData.courseTopic || !formData.subjectArea || !formData.knowledgeLevel || !formData.learningGoal) {
-                alert('Пожалуйста, заполните все обязательные поля');
-                return;
-            }
-            
             // Send data to the Telegram bot
             webApp.sendData(JSON.stringify(formData));
             
             // Show success message
             document.getElementById('courseForm').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('submitButton').style.display = 'none';
+            document.querySelector('.button-fade').style.display = 'none';
             
             // Optionally close the mini app after a delay
             setTimeout(() => {
