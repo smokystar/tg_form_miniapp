@@ -6,6 +6,7 @@
     <title>Форма курса</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* Базовые переменные темы */
         :root {
             --tg-theme-bg-color: #1c222b;
             --tg-theme-text-color: #ffffff;
@@ -17,12 +18,13 @@
             --submit-button-color: #50C566;
         }
 
+        /* Базовые стили */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background-color: var(--tg-theme-bg-color);
             color: var(--tg-theme-text-color);
             margin: 0;
-            padding: 0 0 80px 0;
+            padding: 0 0 100px 0; /* Увеличенный нижний отступ */
             font-size: 16px;
             line-height: 1.4;
             -webkit-tap-highlight-color: transparent;
@@ -34,6 +36,7 @@
             margin: 0 auto;
         }
 
+        /* Стили групп формы */
         .form-group {
             margin-bottom: 24px;
         }
@@ -55,38 +58,42 @@
             margin-bottom: 16px;
         }
 
-        /* Стиль для текстовых полей (вместо contenteditable) */
-        .text-input {
+        /* Стили для нативных элементов формы */
+        .form-input {
             width: 100%;
             background-color: var(--tg-theme-secondary-bg-color);
             color: var(--tg-theme-text-color);
-            border: none;
+            border: 1px solid transparent;
             border-radius: 8px;
             padding: 12px 16px;
             font-size: 16px;
             box-sizing: border-box;
             min-height: 48px;
             margin-bottom: 8px;
-            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
         }
 
-        .text-input::placeholder {
+        .form-input:focus {
+            outline: none;
+            border-color: var(--tg-theme-link-color);
+        }
+
+        .form-input::placeholder {
             color: var(--tg-theme-hint-color);
         }
-        
-        /* Стиль для многострочных текстовых полей */
-        .text-input[data-multiline="true"] {
+
+        /* Специальные стили для textarea */
+        textarea.form-input {
             min-height: 100px;
-            resize: vertical;
+            resize: none; /* Предотвращаем изменение размера на iOS */
         }
 
+        /* Стили для кнопки отправки */
         .submit-btn {
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            right: 16px;
-            max-width: 500px;
-            margin: 0 auto;
+            display: block;
+            width: 100%;
+            max-width: 100%;
             background-color: var(--submit-button-color);
             color: white;
             border: none;
@@ -95,104 +102,135 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            z-index: 100;
+            margin-top: 32px;
             text-align: center;
         }
 
+        /* Сообщение об успехе */
         .success-message {
             display: none;
             text-align: center;
             padding: 20px;
             background-color: rgba(46, 204, 113, 0.2);
             border-radius: 8px;
-            margin-top: 20px;
+            margin-top: 32px;
+            color: #fff;
+        }
+
+        /* Стили для ошибок валидации */
+        .form-input.error {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 4px;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="form-group">
-            <div class="form-label">ТЕМА КУРСА</div>
-            <input type="text" class="text-input" id="courseTopic" placeholder="Введите текст" required>
-            <div class="form-hint">Напишите тему, которую вы бы хотели изучить</div>
-        </div>
+        <form id="courseForm">
+            <div class="form-group">
+                <label class="form-label" for="courseTopic">Тема курса</label>
+                <input type="text" class="form-input" id="courseTopic" name="courseTopic" placeholder="Введите текст" required>
+                <div class="error-message" id="courseTopic-error">Это поле обязательно для заполнения</div>
+                <div class="form-hint">Напишите тему, которую вы бы хотели изучить</div>
+            </div>
 
-        <div class="form-group">
-            <div class="form-label">ПРЕДМЕТНАЯ ОБЛАСТЬ</div>
-            <input type="text" class="text-input" id="subjectArea" placeholder="Введите текст" required>
-            <div class="form-hint">Укажите область необходимых знаний, к примеру, курс по теории вероятности может применяться для математических задач, для экономических задач или для программирования</div>
-        </div>
+            <div class="form-group">
+                <label class="form-label" for="subjectArea">Предметная область</label>
+                <input type="text" class="form-input" id="subjectArea" name="subjectArea" placeholder="Введите текст" required>
+                <div class="error-message" id="subjectArea-error">Это поле обязательно для заполнения</div>
+                <div class="form-hint">Укажите область необходимых знаний, к примеру, курс по теории вероятности может применяться для математических задач, для экономических задач или для программирования</div>
+            </div>
 
-        <div class="form-group">
-            <div class="form-label">УРОВЕНЬ ЗНАНИЙ</div>
-            <input type="text" class="text-input" id="knowledgeLevel" placeholder="Введите ответ" required>
-            <div class="form-hint">Укажите необходимый уровень сложности курса</div>
-        </div>
+            <div class="form-group">
+                <label class="form-label" for="knowledgeLevel">Уровень знаний</label>
+                <input type="text" class="form-input" id="knowledgeLevel" name="knowledgeLevel" placeholder="Введите ответ" required>
+                <div class="error-message" id="knowledgeLevel-error">Это поле обязательно для заполнения</div>
+                <div class="form-hint">Укажите необходимый уровень сложности курса</div>
+            </div>
 
-        <div class="form-group">
-            <div class="form-label">ЦЕЛЬ ОБУЧЕНИЯ</div>
-            <input type="text" class="text-input" id="learningGoal" placeholder="Введите ответ" required>
-            <div class="form-hint">Укажите для каких целей вам нужен курс, например, для личного развития / для решения рабочих задач</div>
-        </div>
+            <div class="form-group">
+                <label class="form-label" for="learningGoal">Цель обучения</label>
+                <input type="text" class="form-input" id="learningGoal" name="learningGoal" placeholder="Введите ответ" required>
+                <div class="error-message" id="learningGoal-error">Это поле обязательно для заполнения</div>
+                <div class="form-hint">Укажите для каких целей вам нужен курс, например, для личного развития / для решения рабочих задач</div>
+            </div>
 
-        <div class="form-group">
-            <div class="form-label">ДОПОЛНИТЕЛЬНЫЕ КОММЕНТАРИИ</div>
-            <textarea class="text-input" id="additionalComments" placeholder="Введите текст" data-multiline="true"></textarea>
-        </div>
+            <div class="form-group">
+                <label class="form-label" for="additionalComments">Дополнительные комментарии</label>
+                <textarea class="form-input" id="additionalComments" name="additionalComments" placeholder="Введите текст" rows="4"></textarea>
+                <div class="form-hint">Необязательное поле</div>
+            </div>
 
-        <div id="successMessage" class="success-message">
-            Форма успешно отправлена! Спасибо за заявку.
-        </div>
+            <button type="button" class="submit-btn" id="submitButton">Отправить</button>
+
+            <div id="successMessage" class="success-message">
+                Форма успешно отправлена! Спасибо за заявку.
+            </div>
+        </form>
     </div>
-
-    <!-- Кнопка отправки формы -->
-    <div class="submit-btn" id="submitButton">Отправить</div>
 
     <script>
         // Инициализация Telegram WebApp
-        let tg = window.Telegram.WebApp;
+        const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Проверяем готовность WebApp
-        if (tg.initDataUnsafe && Object.keys(tg.initDataUnsafe).length > 0) {
-            console.log("WebApp готов");
-            console.log("Версия WebApp:", tg.version);
-            console.log("Платформа:", tg.platform);
-            if (tg.initDataUnsafe.user) {
-                console.log("Пользователь:", tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.id);
-            }
-        } else {
-            console.log("Ожидание инициализации WebApp");
-        }
+        // Отладочная информация о WebApp
+        console.log("WebApp версия:", tg.version);
+        console.log("Платформа:", tg.platform);
         
         // Получаем элементы формы
+        const form = document.getElementById('courseForm');
         const submitButton = document.getElementById('submitButton');
+        const requiredInputs = document.querySelectorAll('.form-input[required]');
+        const successMessage = document.getElementById('successMessage');
         
-        // Функция для проверки, заполнены ли все обязательные поля
+        // Добавляем обработчики событий для валидации полей
+        requiredInputs.forEach(input => {
+            // Убираем красную границу при вводе
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                document.getElementById(`${this.id}-error`).style.display = 'none';
+            });
+            
+            // Проверяем валидность поля при потере фокуса
+            input.addEventListener('blur', function() {
+                if (!this.value.trim()) {
+                    this.classList.add('error');
+                    document.getElementById(`${this.id}-error`).style.display = 'block';
+                }
+            });
+        });
+        
+        // Функция валидации формы
         function validateForm() {
             let isValid = true;
-            const requiredInputs = document.querySelectorAll('.text-input[required]');
             
             requiredInputs.forEach(input => {
                 if (!input.value.trim()) {
+                    input.classList.add('error');
+                    document.getElementById(`${input.id}-error`).style.display = 'block';
                     isValid = false;
-                    input.style.borderColor = 'red';
-                } else {
-                    input.style.borderColor = '';
                 }
             });
             
             return isValid;
         }
-
-        // Обработчик нажатия на кнопку "Отправить"
+        
+        // Обработчик отправки формы
         submitButton.addEventListener('click', function() {
+            // Проверяем валидность формы
             if (!validateForm()) {
                 tg.showAlert('Пожалуйста, заполните все обязательные поля.');
                 return;
             }
             
-            // Сбор данных из всех полей
+            // Собираем данные формы
             const formData = {
                 courseTopic: document.getElementById('courseTopic').value.trim(),
                 subjectArea: document.getElementById('subjectArea').value.trim(),
@@ -201,31 +239,31 @@
                 additionalComments: document.getElementById('additionalComments').value.trim()
             };
             
-            console.log('Отправляемые данные:', formData);
+            console.log("Отправляемые данные:", formData);
             
             try {
-                // Отправка данных в Telegram через sendData
-                console.log('Отправка данных через sendData...');
-                tg.sendData(JSON.stringify(formData));
-                
-                // Показываем сообщение об успехе
-                document.querySelectorAll('.form-group').forEach(group => {
+                // Показываем индикатор успешной отправки
+                Array.from(document.querySelectorAll('.form-group')).forEach(group => {
                     group.style.display = 'none';
                 });
-                document.getElementById('successMessage').style.display = 'block';
                 submitButton.style.display = 'none';
+                successMessage.style.display = 'block';
                 
-                // Закрываем приложение через 2 секунды
+                // Отправляем данные в Telegram
+                console.log("Отправка данных через Telegram WebApp API...");
+                tg.sendData(JSON.stringify(formData));
+                
+                // Закрываем WebApp через 2 секунды
                 setTimeout(() => {
                     tg.close();
                 }, 2000);
             } catch (error) {
-                console.error('Ошибка при отправке данных:', error);
-                tg.showAlert('Ошибка при отправке данных. Пожалуйста, попробуйте еще раз.');
+                console.error("Ошибка при отправке данных:", error);
+                tg.showAlert("Произошла ошибка при отправке формы. Пожалуйста, попробуйте еще раз.");
             }
         });
-
-        // Применяем тему Telegram
+        
+        // Устанавливаем темы на основе Telegram
         document.addEventListener('DOMContentLoaded', function() {
             if (tg.themeParams) {
                 document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#1c222b');
