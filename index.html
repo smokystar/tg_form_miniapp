@@ -23,6 +23,7 @@
             margin: 0;
             padding: 0;
             font-size: 16px;
+            padding-bottom: 80px; /* Отступ для кнопки внизу */
         }
 
         .container {
@@ -79,6 +80,13 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
+            position: fixed;
+            bottom: 16px;
+            left: 0;
+            right: 0;
+            max-width: calc(100% - 32px);
+            margin: 0 auto;
+            z-index: 100;
         }
 
         .success-message {
@@ -93,28 +101,29 @@
 </head>
 <body>
     <div class="container">
+        <!-- Форма для сбора данных -->
         <form id="courseForm">
             <div class="form-group">
                 <label for="courseTopic" class="form-label">Тема курса</label>
-                <input type="text" id="courseTopic" name="courseTopic" class="form-input" required>
+                <input type="text" inputmode="text" id="courseTopic" name="courseTopic" class="form-input" required>
                 <span class="form-hint">Напишите тему, которую вы бы хотели изучить</span>
             </div>
 
             <div class="form-group">
                 <label for="subjectArea" class="form-label">Предметная область</label>
-                <input type="text" id="subjectArea" name="subjectArea" class="form-input" required>
+                <input type="text" inputmode="text" id="subjectArea" name="subjectArea" class="form-input" required>
                 <span class="form-hint">Укажите область необходимых знаний</span>
             </div>
 
             <div class="form-group">
                 <label for="knowledgeLevel" class="form-label">Уровень знаний</label>
-                <input type="text" id="knowledgeLevel" name="knowledgeLevel" class="form-input" required>
+                <input type="text" inputmode="text" id="knowledgeLevel" name="knowledgeLevel" class="form-input" required>
                 <span class="form-hint">Укажите необходимый уровень сложности курса</span>
             </div>
 
             <div class="form-group">
                 <label for="learningGoal" class="form-label">Цель обучения</label>
-                <input type="text" id="learningGoal" name="learningGoal" class="form-input" required>
+                <input type="text" inputmode="text" id="learningGoal" name="learningGoal" class="form-input" required>
                 <span class="form-hint">Укажите для каких целей вам нужен курс</span>
             </div>
 
@@ -122,14 +131,16 @@
                 <label for="additionalComments" class="form-label">Дополнительные комментарии</label>
                 <textarea id="additionalComments" name="additionalComments" class="form-input"></textarea>
             </div>
-
-            <button type="submit" class="submit-btn">Отправить</button>
         </form>
 
+        <!-- Сообщение об успешной отправке -->
         <div id="successMessage" class="success-message">
             Форма успешно отправлена! Спасибо за заявку.
         </div>
     </div>
+
+    <!-- Кнопка отправки формы (вне формы для лучшей видимости при открытой клавиатуре) -->
+    <button id="submitButton" class="submit-btn">Отправить</button>
 
     <script>
         // Initialize Telegram WebApp
@@ -148,13 +159,56 @@
                 document.documentElement.style.setProperty('--tg-theme-button-text-color', webApp.themeParams.button_text_color || '#ffffff');
                 document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', webApp.themeParams.secondary_bg_color || '#131820');
             }
+
+            // Добавляем атрибуты для iOS, чтобы включить кнопку "Готово" на клавиатуре
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                const inputs = document.querySelectorAll('input[type="text"]');
+                inputs.forEach(input => {
+                    // Добавляем кнопку return на клавиатуре
+                    input.setAttribute('enterkeyhint', 'done');
+                });
+
+                // Для textarea тоже добавляем
+                const textareas = document.querySelectorAll('textarea');
+                textareas.forEach(textarea => {
+                    textarea.setAttribute('enterkeyhint', 'done');
+                });
+            }
         });
 
-        // Form submission handler
-        document.getElementById('courseForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Обработчики для скрытия клавиатуры при нажатии Enter
+        const inputs = document.querySelectorAll('input[type="text"]');
+        inputs.forEach(input => {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.blur(); // Снимаем фокус для скрытия клавиатуры
+                }
+            });
+        });
+
+        // Обработчик кнопки отправки (вынесенной за пределы формы)
+        document.getElementById('submitButton').addEventListener('click', function() {
+            // Проверяем заполнены ли обязательные поля
+            const requiredFields = document.querySelectorAll('[required]');
+            let isValid = true;
             
-            // Get form values
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Пожалуйста, заполните все обязательные поля');
+                return;
+            }
+            
+            // Если все в порядке, собираем данные
             const formData = {
                 courseTopic: document.getElementById('courseTopic').value,
                 subjectArea: document.getElementById('subjectArea').value,
@@ -163,14 +217,15 @@
                 additionalComments: document.getElementById('additionalComments').value
             };
             
-            // Send data to the Telegram bot
+            // Отправляем данные в Telegram
             webApp.sendData(JSON.stringify(formData));
             
-            // Show success message
+            // Показываем сообщение об успехе
             document.getElementById('courseForm').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('submitButton').style.display = 'none';
             
-            // Optionally close the mini app after a delay
+            // Закрываем приложение через небольшую задержку
             setTimeout(() => {
                 webApp.close();
             }, 3000);
