@@ -98,10 +98,25 @@
             border-radius: 8px;
             margin-top: 20px;
         }
+
+        /* Невидимая область для снятия фокуса */
+        .blur-trigger {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            display: none;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Добавляем невидимый элемент для снятия фокуса -->
+        <div id="blurTrigger" class="blur-trigger"></div>
+
         <form id="courseForm">
             <div class="form-group">
                 <label for="courseTopic" class="form-label">Тема курса</label>
@@ -146,6 +161,43 @@
         webApp.expand();
         webApp.ready();
 
+        // Получаем элементы DOM
+        const blurTrigger = document.getElementById('blurTrigger');
+        const inputs = document.querySelectorAll('input, textarea');
+        
+        // Функция для скрытия клавиатуры
+        function hideKeyboard() {
+            document.activeElement.blur();
+            blurTrigger.style.display = 'none';
+        }
+        
+        // Обработчики событий для полей ввода
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                // При фокусе на поле ввода показываем невидимый элемент
+                blurTrigger.style.display = 'block';
+            });
+            
+            // Для мобильных устройств добавляем обработчик ввода
+            input.addEventListener('keydown', (e) => {
+                // Скрываем клавиатуру при нажатии Enter (кроме textarea)
+                if (e.key === 'Enter' && input.tagName.toLowerCase() !== 'textarea') {
+                    e.preventDefault();
+                    hideKeyboard();
+                    
+                    // Переход к следующему полю, если есть
+                    const allInputs = Array.from(inputs);
+                    const currentIndex = allInputs.indexOf(input);
+                    if (currentIndex < allInputs.length - 1) {
+                        allInputs[currentIndex + 1].focus();
+                    }
+                }
+            });
+        });
+        
+        // Обработчик клика на невидимый элемент для снятия фокуса
+        blurTrigger.addEventListener('click', hideKeyboard);
+
         // Apply Telegram theme to our custom variables if available
         document.addEventListener('DOMContentLoaded', function() {
             if (webApp.themeParams) {
@@ -163,6 +215,9 @@
         document.getElementById('courseForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Скрываем клавиатуру перед отправкой формы
+            hideKeyboard();
+            
             // Get form values
             const formData = {
                 courseTopic: document.getElementById('courseTopic').value,
@@ -175,23 +230,6 @@
             // Send data to the Telegram bot
             webApp.sendData(JSON.stringify(formData));
             
-            // Alternatively, if you have a backend API endpoint, you can send data there
-            // fetch('YOUR_API_ENDPOINT', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify(formData)
-            // })
-            // .then(response => response.json())
-            // .then(data => {
-            //     console.log('Success:', data);
-            //     showSuccessMessage();
-            // })
-            // .catch((error) => {
-            //     console.error('Error:', error);
-            // });
-
             // Show success message
             document.getElementById('courseForm').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
