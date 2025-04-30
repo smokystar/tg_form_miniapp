@@ -203,6 +203,11 @@
         // Проверяем готовность WebApp
         if (tg.initDataUnsafe && Object.keys(tg.initDataUnsafe).length > 0) {
             console.log("WebApp готов");
+            console.log("Версия WebApp:", tg.version);
+            console.log("Платформа:", tg.platform);
+            if (tg.initDataUnsafe.user) {
+                console.log("Пользователь:", tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.id);
+            }
         } else {
             console.log("Ожидание инициализации WebApp");
         }
@@ -330,20 +335,42 @@
             
             console.log('Отправляемые данные:', formData);
             
-            // Отправка данных в Telegram
-            tg.sendData(JSON.stringify(formData));
+            // Настраиваем кнопку MainButton для Telegram
+            tg.MainButton.setText('Отправить данные');
+            tg.MainButton.show();
             
-            // Показываем сообщение об успехе
-            document.querySelectorAll('.form-group').forEach(group => {
-                group.style.display = 'none';
-            });
-            document.getElementById('successMessage').style.display = 'block';
-            submitButton.style.display = 'none';
+            // Функция для отправки данных
+            function sendDataToBot() {
+                try {
+                    // Отправляем сначала данные через MainButton
+                    tg.MainButton.hide();
+                    
+                    // Отправка данных в Telegram через sendData 
+                    console.log('Отправка данных через sendData...');
+                    tg.sendData(JSON.stringify(formData));
+                    
+                    // Показываем сообщение об успехе
+                    document.querySelectorAll('.form-group').forEach(group => {
+                        group.style.display = 'none';
+                    });
+                    document.getElementById('successMessage').style.display = 'block';
+                    submitButton.style.display = 'none';
+                    
+                    // Закрываем приложение через 2 секунды
+                    setTimeout(() => {
+                        tg.close();
+                    }, 2000);
+                } catch (error) {
+                    console.error('Ошибка при отправке данных:', error);
+                    tg.showAlert('Ошибка при отправке данных. Пожалуйста, попробуйте еще раз.');
+                }
+            }
             
-            // Закрываем приложение через 3 секунды
-            setTimeout(() => {
-                tg.close();
-            }, 3000);
+            // Назначаем функцию отправки данных на кнопку MainButton
+            tg.MainButton.onClick(sendDataToBot);
+            
+            // Дополнительно вызываем функцию отправки напрямую
+            sendDataToBot();
         });
 
         // Функция для получения значения поля с проверкой на плейсхолдер
