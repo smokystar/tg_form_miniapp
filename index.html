@@ -155,90 +155,118 @@
         </div>
     </div>
 
-    <script>
-        // Initialize Telegram WebApp
-        const webApp = window.Telegram.WebApp;
-        webApp.expand();
-        webApp.ready();
+    // Замените блок скрипта в вашем HTML на этот код
 
-        // Получаем элементы DOM
-        const blurTrigger = document.getElementById('blurTrigger');
-        const inputs = document.querySelectorAll('input, textarea');
+<script>
+    // Initialize Telegram WebApp
+    const webApp = window.Telegram.WebApp;
+    webApp.expand();
+    webApp.ready();
+
+    // Функция для скрытия клавиатуры на iOS
+    function closeKeyboard() {
+        // Создаем временный элемент ввода
+        const temp = document.createElement('input');
+        // Добавляем его в DOM
+        document.body.appendChild(temp);
+        // Фокусируемся на нем (это заставит клавиатуру скрыться с текущего поля)
+        temp.focus();
+        // Убираем фокус
+        temp.blur();
+        // Удаляем временный элемент
+        document.body.removeChild(temp);
         
-        // Функция для скрытия клавиатуры
-        function hideKeyboard() {
+        // В некоторых случаях может помочь также размытие активного элемента
+        if (document.activeElement) {
             document.activeElement.blur();
-            blurTrigger.style.display = 'none';
         }
-        
-        // Обработчики событий для полей ввода
-        inputs.forEach(input => {
-            input.addEventListener('focus', () => {
-                // При фокусе на поле ввода показываем невидимый элемент
-                blurTrigger.style.display = 'block';
-            });
-            
-            // Для мобильных устройств добавляем обработчик ввода
-            input.addEventListener('keydown', (e) => {
-                // Скрываем клавиатуру при нажатии Enter (кроме textarea)
-                if (e.key === 'Enter' && input.tagName.toLowerCase() !== 'textarea') {
-                    e.preventDefault();
-                    hideKeyboard();
+    }
+
+    // Обработчик события для удаления клавиатуры при клике вне полей ввода
+    document.body.addEventListener('click', function(e) {
+        // Проверяем, был ли клик не на поле ввода
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+            closeKeyboard();
+        }
+    });
+
+    // Обработчик для всех полей ввода - скрывать клавиатуру при нажатии Enter
+    const allInputs = document.querySelectorAll('input, textarea');
+    allInputs.forEach(input => {
+        // Для обычных полей ввода (не textarea)
+        if (input.tagName.toLowerCase() === 'input') {
+            input.addEventListener('keydown', function(e) {
+                // Если нажата клавиша Enter
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault(); // Предотвращаем стандартное поведение
+                    closeKeyboard();    // Скрываем клавиатуру
                     
-                    // Переход к следующему полю, если есть
-                    const allInputs = Array.from(inputs);
-                    const currentIndex = allInputs.indexOf(input);
-                    if (currentIndex < allInputs.length - 1) {
-                        allInputs[currentIndex + 1].focus();
+                    // Переходим к следующему полю, если оно есть
+                    const inputs = Array.from(document.querySelectorAll('input, textarea, select'));
+                    const index = inputs.indexOf(this);
+                    if (index < inputs.length - 1) {
+                        // Небольшая задержка для iOS
+                        setTimeout(() => {
+                            inputs[index + 1].focus();
+                        }, 100);
                     }
                 }
             });
-        });
-        
-        // Обработчик клика на невидимый элемент для снятия фокуса
-        blurTrigger.addEventListener('click', hideKeyboard);
+        }
+    });
 
-        // Apply Telegram theme to our custom variables if available
-        document.addEventListener('DOMContentLoaded', function() {
-            if (webApp.themeParams) {
-                document.documentElement.style.setProperty('--tg-theme-bg-color', webApp.themeParams.bg_color || '#1c222b');
-                document.documentElement.style.setProperty('--tg-theme-text-color', webApp.themeParams.text_color || '#ffffff');
-                document.documentElement.style.setProperty('--tg-theme-hint-color', webApp.themeParams.hint_color || '#7d8699');
-                document.documentElement.style.setProperty('--tg-theme-link-color', webApp.themeParams.link_color || '#6ab2f2');
-                document.documentElement.style.setProperty('--tg-theme-button-color', webApp.themeParams.button_color || '#5288c1');
-                document.documentElement.style.setProperty('--tg-theme-button-text-color', webApp.themeParams.button_text_color || '#ffffff');
-                document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', webApp.themeParams.secondary_bg_color || '#131820');
+    // Специальная обработка для iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+        // Дополнительные обработчики специально для iOS
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+                closeKeyboard();
             }
         });
+    }
 
-        // Form submission handler
-        document.getElementById('courseForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Скрываем клавиатуру перед отправкой формы
-            hideKeyboard();
-            
-            // Get form values
-            const formData = {
-                courseTopic: document.getElementById('courseTopic').value,
-                subjectArea: document.getElementById('subjectArea').value,
-                knowledgeLevel: document.getElementById('knowledgeLevel').value,
-                learningGoal: document.getElementById('learningGoal').value,
-                additionalComments: document.getElementById('additionalComments').value
-            };
-            
-            // Send data to the Telegram bot
-            webApp.sendData(JSON.stringify(formData));
-            
-            // Show success message
-            document.getElementById('courseForm').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
-            
-            // Optionally close the mini app after a delay
-            setTimeout(() => {
-                webApp.close();
-            }, 3000);
-        });
-    </script>
+    // Apply Telegram theme to our custom variables if available
+    document.addEventListener('DOMContentLoaded', function() {
+        if (webApp.themeParams) {
+            document.documentElement.style.setProperty('--tg-theme-bg-color', webApp.themeParams.bg_color || '#1c222b');
+            document.documentElement.style.setProperty('--tg-theme-text-color', webApp.themeParams.text_color || '#ffffff');
+            document.documentElement.style.setProperty('--tg-theme-hint-color', webApp.themeParams.hint_color || '#7d8699');
+            document.documentElement.style.setProperty('--tg-theme-link-color', webApp.themeParams.link_color || '#6ab2f2');
+            document.documentElement.style.setProperty('--tg-theme-button-color', webApp.themeParams.button_color || '#5288c1');
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', webApp.themeParams.button_text_color || '#ffffff');
+            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', webApp.themeParams.secondary_bg_color || '#131820');
+        }
+    });
+
+    // Form submission handler
+    document.getElementById('courseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Скрываем клавиатуру принудительно
+        closeKeyboard();
+        
+        // Get form values
+        const formData = {
+            courseTopic: document.getElementById('courseTopic').value,
+            subjectArea: document.getElementById('subjectArea').value,
+            knowledgeLevel: document.getElementById('knowledgeLevel').value,
+            learningGoal: document.getElementById('learningGoal').value,
+            additionalComments: document.getElementById('additionalComments').value
+        };
+        
+        // Send data to the Telegram bot
+        webApp.sendData(JSON.stringify(formData));
+        
+        // Show success message
+        document.getElementById('courseForm').style.display = 'none';
+        document.getElementById('successMessage').style.display = 'block';
+        
+        // Optionally close the mini app after a delay
+        setTimeout(() => {
+            webApp.close();
+        }, 3000);
+    });
+</script>
 </body>
 </html>
