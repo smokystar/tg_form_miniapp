@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма курса</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/telegram-web-app/6.7.0/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --tg-theme-bg-color: #1c222b;
+            --tg-theme-text-color: #ffffff;
+            --tg-theme-hint-color: #7d8699;
+            --tg-theme-link-color: #6ab2f2;
+            --tg-theme-button-color: #5288c1;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #131820;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+        }
+
+        .container {
+            padding: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--tg-theme-link-color);
+            text-transform: uppercase;
+        }
+
+        .form-hint {
+            display: block;
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+            margin-top: 8px;
+            margin-bottom: 16px;
+        }
+
+        .form-input {
+            width: 100%;
+            background-color: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 16px;
+            box-sizing: border-box;
+            min-height: 48px;
+        }
+
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        .submit-btn:active {
+            opacity: 0.8;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(46, 204, 113, 0.2);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="courseForm">
+            <div class="form-group">
+                <label for="courseTopic" class="form-label">Тема курса</label>
+                <input type="text" id="courseTopic" class="form-input" required>
+                <span class="form-hint">Напишите тему, которую вы бы хотели изучить</span>
+            </div>
+
+            <div class="form-group">
+                <label for="subjectArea" class="form-label">Предметная область</label>
+                <input type="text" id="subjectArea" class="form-input" required>
+                <span class="form-hint">Укажите область необходимых знаний, к примеру, курс по теории вероятности может применяться для математических задач, для экономических задач или для программирования</span>
+            </div>
+
+            <div class="form-group">
+                <label for="knowledgeLevel" class="form-label">Уровень знаний</label>
+                <input type="text" id="knowledgeLevel" class="form-input" required>
+                <span class="form-hint">Укажите необходимый уровень сложности курса</span>
+            </div>
+
+            <div class="form-group">
+                <label for="learningGoal" class="form-label">Цель обучения</label>
+                <input type="text" id="learningGoal" class="form-input" required>
+                <span class="form-hint">Укажите для каких целей вам нужен курс, например, для личного развития / для решения рабочих задач</span>
+            </div>
+
+            <div class="form-group">
+                <label for="additionalComments" class="form-label">Дополнительные комментарии</label>
+                <textarea id="additionalComments" class="form-input"></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Отправить</button>
+        </form>
+
+        <div id="successMessage" class="success-message">
+            Форма успешно отправлена! Спасибо за заявку.
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram WebApp
+        const webApp = window.Telegram.WebApp;
+        webApp.expand();
+        webApp.ready();
+
+        // Apply Telegram theme to our custom variables if available
+        document.addEventListener('DOMContentLoaded', function() {
+            if (webApp.themeParams) {
+                document.documentElement.style.setProperty('--tg-theme-bg-color', webApp.themeParams.bg_color || '#1c222b');
+                document.documentElement.style.setProperty('--tg-theme-text-color', webApp.themeParams.text_color || '#ffffff');
+                document.documentElement.style.setProperty('--tg-theme-hint-color', webApp.themeParams.hint_color || '#7d8699');
+                document.documentElement.style.setProperty('--tg-theme-link-color', webApp.themeParams.link_color || '#6ab2f2');
+                document.documentElement.style.setProperty('--tg-theme-button-color', webApp.themeParams.button_color || '#5288c1');
+                document.documentElement.style.setProperty('--tg-theme-button-text-color', webApp.themeParams.button_text_color || '#ffffff');
+                document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', webApp.themeParams.secondary_bg_color || '#131820');
+            }
+        });
+
+        // Form submission handler
+        document.getElementById('courseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const formData = {
+                courseTopic: document.getElementById('courseTopic').value,
+                subjectArea: document.getElementById('subjectArea').value,
+                knowledgeLevel: document.getElementById('knowledgeLevel').value,
+                learningGoal: document.getElementById('learningGoal').value,
+                additionalComments: document.getElementById('additionalComments').value
+            };
+            
+            // Send data to the Telegram bot
+            webApp.sendData(JSON.stringify(formData));
+            
+            // Alternatively, if you have a backend API endpoint, you can send data there
+            // fetch('YOUR_API_ENDPOINT', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify(formData)
+            // })
+            // .then(response => response.json())
+            // .then(data => {
+            //     console.log('Success:', data);
+            //     showSuccessMessage();
+            // })
+            // .catch((error) => {
+            //     console.error('Error:', error);
+            // });
+
+            // Show success message
+            document.getElementById('courseForm').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // Optionally close the mini app after a delay
+            setTimeout(() => {
+                webApp.close();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
