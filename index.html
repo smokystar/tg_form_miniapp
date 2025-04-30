@@ -29,7 +29,6 @@
             padding: 16px;
             max-width: 500px;
             margin: 0 auto;
-            padding-bottom: 80px; /* Дополнительный отступ внизу */
         }
 
         .form-group {
@@ -80,22 +79,6 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            transition: opacity 0.2s;
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            right: 16px;
-            max-width: calc(500px - 32px);
-            margin: 0 auto;
-            z-index: 100;
-        }
-
-        .submit-btn:hover {
-            opacity: 0.9;
-        }
-
-        .submit-btn:active {
-            opacity: 0.8;
         }
 
         .success-message {
@@ -106,18 +89,6 @@
             border-radius: 8px;
             margin-top: 20px;
         }
-
-        /* Затемнение над кнопкой */
-        .button-fade {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 80px;
-            background: linear-gradient(to bottom, rgba(28, 34, 43, 0), rgba(28, 34, 43, 1));
-            pointer-events: none;
-            z-index: 90;
-        }
     </style>
 </head>
 <body>
@@ -125,44 +96,40 @@
         <form id="courseForm">
             <div class="form-group">
                 <label for="courseTopic" class="form-label">Тема курса</label>
-                <input type="text" id="courseTopic" class="form-input" placeholder="Напишите тему, которую вы бы хотели изучить" required>
+                <input type="text" id="courseTopic" name="courseTopic" class="form-input" required>
                 <span class="form-hint">Напишите тему, которую вы бы хотели изучить</span>
             </div>
 
             <div class="form-group">
                 <label for="subjectArea" class="form-label">Предметная область</label>
-                <input type="text" id="subjectArea" class="form-input" placeholder="Укажите область необходимых знаний" required>
-                <span class="form-hint">Укажите область необходимых знаний, к примеру, курс по теории вероятности может применяться для математических задач, для экономических задач или для программирования</span>
+                <input type="text" id="subjectArea" name="subjectArea" class="form-input" required>
+                <span class="form-hint">Укажите область необходимых знаний</span>
             </div>
 
             <div class="form-group">
-                <label for="knowledgeLevel" class="form-label">Уровень знаний для курса</label>
-                <input type="text" id="knowledgeLevel" class="form-input" placeholder="Укажите необходимый уровень сложности курса" required>
+                <label for="knowledgeLevel" class="form-label">Уровень знаний</label>
+                <input type="text" id="knowledgeLevel" name="knowledgeLevel" class="form-input" required>
                 <span class="form-hint">Укажите необходимый уровень сложности курса</span>
             </div>
 
             <div class="form-group">
                 <label for="learningGoal" class="form-label">Цель обучения</label>
-                <input type="text" id="learningGoal" class="form-input" placeholder="Укажите для каких целей вам нужен курс" required>
-                <span class="form-hint">Укажите для каких целей вам нужен курс, например, для личного развития / для решения рабочих задач</span>
+                <input type="text" id="learningGoal" name="learningGoal" class="form-input" required>
+                <span class="form-hint">Укажите для каких целей вам нужен курс</span>
             </div>
 
             <div class="form-group">
                 <label for="additionalComments" class="form-label">Дополнительные комментарии</label>
-                <textarea id="additionalComments" class="form-input" placeholder="Дополнительная информация (необязательно)"></textarea>
+                <textarea id="additionalComments" name="additionalComments" class="form-input"></textarea>
             </div>
+
+            <button type="submit" class="submit-btn">Отправить</button>
         </form>
 
         <div id="successMessage" class="success-message">
             Форма успешно отправлена! Спасибо за заявку.
         </div>
     </div>
-
-    <!-- Затемнение над кнопкой -->
-    <div class="button-fade"></div>
-    
-    <!-- Кнопка отправки, вынесенная за пределы прокрутки -->
-    <button id="submitButton" class="submit-btn">Отправить</button>
 
     <script>
         // Initialize Telegram WebApp
@@ -180,34 +147,12 @@
                 document.documentElement.style.setProperty('--tg-theme-button-color', webApp.themeParams.button_color || '#5288c1');
                 document.documentElement.style.setProperty('--tg-theme-button-text-color', webApp.themeParams.button_text_color || '#ffffff');
                 document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', webApp.themeParams.secondary_bg_color || '#131820');
-                
-                // Обновляем цвет градиента в соответствии с темой
-                const bgColor = webApp.themeParams.bg_color || '#1c222b';
-                document.querySelector('.button-fade').style.background = `linear-gradient(to bottom, ${bgColor}00, ${bgColor})`;
             }
         });
 
-        // Обработчик отправки формы (вне самой формы)
-        document.getElementById('submitButton').addEventListener('click', function() {
-            const form = document.getElementById('courseForm');
-            
-            // Проверяем валидность формы
-            const requiredFields = form.querySelectorAll('[required]');
-            let isValid = true;
-            
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.classList.add('invalid');
-                    isValid = false;
-                } else {
-                    field.classList.remove('invalid');
-                }
-            });
-            
-            if (!isValid) {
-                alert('Пожалуйста, заполните все обязательные поля');
-                return;
-            }
+        // Form submission handler
+        document.getElementById('courseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             
             // Get form values
             const formData = {
@@ -224,8 +169,6 @@
             // Show success message
             document.getElementById('courseForm').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
-            document.getElementById('submitButton').style.display = 'none';
-            document.querySelector('.button-fade').style.display = 'none';
             
             // Optionally close the mini app after a delay
             setTimeout(() => {
