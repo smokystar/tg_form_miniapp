@@ -330,20 +330,33 @@
             
             console.log('Отправляемые данные:', formData);
             
-            // Отправка данных в Telegram
-            tg.sendData(JSON.stringify(formData));
+            // Устанавливаем данные в MainButton для передачи в Telegram
+            tg.MainButton.setText('Отправить данные');
+            tg.MainButton.show();
             
-            // Показываем сообщение об успехе
-            document.querySelectorAll('.form-group').forEach(group => {
-                group.style.display = 'none';
+            // Сохраняем данные формы, чтобы передать их с MainButton
+            window.formDataToSend = formData;
+            
+            // Отправка данных через MainButton
+            tg.MainButton.onClick(function() {
+                // Отправка данных в Telegram
+                tg.sendData(JSON.stringify(window.formDataToSend));
+                
+                // Показываем сообщение об успехе
+                document.querySelectorAll('.form-group').forEach(group => {
+                    group.style.display = 'none';
+                });
+                document.getElementById('successMessage').style.display = 'block';
+                submitButton.style.display = 'none';
+                
+                // Закрываем приложение через 3 секунды
+                setTimeout(() => {
+                    tg.close();
+                }, 3000);
             });
-            document.getElementById('successMessage').style.display = 'block';
-            submitButton.style.display = 'none';
             
-            // Закрываем приложение через 3 секунды
-            setTimeout(() => {
-                tg.close();
-            }, 3000);
+            // Эмулируем клик по MainButton
+            tg.MainButton.onClick();
         });
 
         // Функция для получения значения поля с проверкой на плейсхолдер
