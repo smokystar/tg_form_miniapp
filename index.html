@@ -8,71 +8,79 @@
     <title>Форма курса</title>
     <style>
         body {
-            --bg-color: var(--tg-theme-bg-color, #fff);
-            font-family: sans-serif;
+            --bg-color: var(--tg-theme-bg-color, #1c222b);
+            --text-color: var(--tg-theme-text-color, #ffffff);
+            --hint-color: var(--tg-theme-hint-color, #7d8699);
+            --link-color: var(--tg-theme-link-color, #6ab2f2);
+            --button-color: var(--tg-theme-button-color, #5288c1);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --secondary-bg-color: var(--tg-theme-secondary-bg-color, #131820);
+            
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background-color: var(--bg-color);
-            color: var(--tg-theme-text-color, #222);
+            color: var(--text-color);
             font-size: 16px;
             margin: 0;
             padding: 0;
-            color-scheme: var(--tg-color-scheme);
         }
 
         .container {
             padding: 20px;
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--tg-theme-text-color, #222);
+            box-sizing: border-box;
         }
 
         .form-group {
             margin-bottom: 20px;
         }
 
-        label {
+        .form-label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--tg-theme-text-color, #222);
-            text-transform: uppercase;
             font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--link-color);
+            text-transform: uppercase;
         }
 
-        input[type="text"],
-        textarea {
+        .form-hint {
             display: block;
+            font-size: 14px;
+            color: var(--hint-color);
+            margin-top: 5px;
+        }
+
+        .form-input {
             width: 100%;
-            padding: 12px 20px;
-            box-sizing: border-box;
-            border: 1px solid var(--tg-theme-hint-color, #ccc);
-            border-radius: 4px;
-            background-color: var(--tg-theme-bg-color, #fff);
-            color: var(--tg-theme-text-color, #222);
+            background-color: var(--secondary-bg-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
             font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+            outline: none;
+        }
+
+        textarea.form-input {
+            min-height: 100px;
             resize: none;
         }
 
-        input:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--tg-theme-button-color, #50a8eb);
+        .form-input::placeholder {
+            color: var(--hint-color);
         }
 
-        .hint {
-            font-size: 12px;
-            color: var(--tg-theme-hint-color, #999);
-            margin-top: 5px;
+        .form-input.error {
+            border: 1px solid #e74c3c;
         }
 
         #status {
             margin-top: 15px;
             padding: 10px;
-            border-radius: 4px;
+            border-radius: 8px;
             display: none;
         }
 
@@ -91,88 +99,143 @@
 </head>
 <body>
     <div class="container">
-        <h1>Форма создания курса</h1>
         <div class="form-group">
-            <label for="courseTopic">Тема курса</label>
-            <input type="text" id="courseTopic" placeholder="Введите тему курса">
-            <div class="hint">Напишите тему, которую вы бы хотели изучить</div>
+            <div class="form-label">ТЕМА КУРСА</div>
+            <input type="text" class="form-input" id="courseTopic" placeholder="Введите текст" required>
+            <div class="form-hint">Напишите тему, которую вы бы хотели изучить</div>
         </div>
+
         <div class="form-group">
-            <label for="subjectArea">Предметная область</label>
-            <input type="text" id="subjectArea" placeholder="Введите предметную область">
-            <div class="hint">Укажите область необходимых знаний</div>
+            <div class="form-label">ПРЕДМЕТНАЯ ОБЛАСТЬ</div>
+            <input type="text" class="form-input" id="subjectArea" placeholder="Введите текст" required>
+            <div class="form-hint">Укажите область необходимых знаний, к примеру, курс по теории вероятности может применяться для математических задач, для экономических задач или для программирования</div>
         </div>
+
         <div class="form-group">
-            <label for="knowledgeLevel">Уровень знаний</label>
-            <input type="text" id="knowledgeLevel" placeholder="Введите уровень сложности">
-            <div class="hint">Укажите необходимый уровень сложности курса</div>
+            <div class="form-label">УРОВЕНЬ ЗНАНИЙ</div>
+            <input type="text" class="form-input" id="knowledgeLevel" placeholder="Введите ответ" required>
+            <div class="form-hint">Укажите необходимый уровень сложности курса</div>
         </div>
+
         <div class="form-group">
-            <label for="learningGoal">Цель обучения</label>
-            <input type="text" id="learningGoal" placeholder="Введите цель обучения">
-            <div class="hint">Укажите для каких целей вам нужен курс</div>
+            <div class="form-label">ЦЕЛЬ ОБУЧЕНИЯ</div>
+            <input type="text" class="form-input" id="learningGoal" placeholder="Введите ответ" required>
+            <div class="form-hint">Укажите для каких целей вам нужен курс, например, для личного развития / для решения рабочих задач</div>
         </div>
+
         <div class="form-group">
-            <label for="additionalComments">Дополнительные комментарии</label>
-            <textarea id="additionalComments" placeholder="Введите дополнительную информацию" rows="3"></textarea>
-            <div class="hint">Необязательное поле</div>
+            <div class="form-label">ДОПОЛНИТЕЛЬНЫЕ КОММЕНТАРИИ</div>
+            <textarea class="form-input" id="additionalComments" placeholder="Введите текст" rows="4"></textarea>
+            <div class="form-hint">Необязательное поле</div>
         </div>
+
         <div id="status"></div>
     </div>
 
     <script>
         // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Расширяем на всю высоту
-        tg.ready(); // Сообщаем приложению, что страница загружена
-
-        // Настройка главной кнопки
+        
+        // Расширяем и говорим, что страница готова
+        tg.expand();
+        tg.ready();
+        
+        // Настраиваем главную кнопку 
         tg.MainButton.setText('Отправить');
         tg.MainButton.show();
         
+        // Элементы формы
         const courseTopicInput = document.getElementById('courseTopic');
         const subjectAreaInput = document.getElementById('subjectArea');
         const knowledgeLevelInput = document.getElementById('knowledgeLevel');
         const learningGoalInput = document.getElementById('learningGoal');
         const additionalCommentsInput = document.getElementById('additionalComments');
-        const statusElem = document.getElementById('status');
-
-        // Простая валидация при нажатии на главную кнопку
-        tg.MainButton.onClick(function() {
-            // Собираем данные из формы
-            const courseTopic = courseTopicInput.value.trim();
-            const subjectArea = subjectAreaInput.value.trim();
-            const knowledgeLevel = knowledgeLevelInput.value.trim();
-            const learningGoal = learningGoalInput.value.trim();
-            const additionalComments = additionalCommentsInput.value.trim();
+        const statusElement = document.getElementById('status');
+        
+        // Проверка обязательных полей при вводе
+        const requiredInputs = document.querySelectorAll('.form-input[required]');
+        requiredInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                checkFormValidity();
+            });
+        });
+        
+        // Проверка валидности формы (включение/отключение кнопки)
+        function checkFormValidity() {
+            let isValid = true;
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                }
+            });
             
-            // Проверка обязательных полей
-            if (courseTopic === '' || subjectArea === '' || knowledgeLevel === '' || learningGoal === '') {
-                statusElem.textContent = 'Пожалуйста, заполните все обязательные поля';
-                statusElem.className = 'error';
+            if (isValid) {
+                tg.MainButton.enable();
+            } else {
+                tg.MainButton.disable();
+            }
+        }
+        
+        // Инициальная проверка формы
+        checkFormValidity();
+        
+        // Обработчик нажатия на главную кнопку
+        tg.MainButton.onClick(function() {
+            // Проверяем форму снова
+            let isValid = true;
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.classList.add('error');
+                }
+            });
+            
+            if (!isValid) {
+                statusElement.textContent = 'Пожалуйста, заполните все обязательные поля';
+                statusElement.className = 'error';
                 return;
             }
             
-            // Создаем объект с данными для отправки
+            // Собираем данные формы
             const formData = {
-                courseTopic: courseTopic,
-                subjectArea: subjectArea,
-                knowledgeLevel: knowledgeLevel,
-                learningGoal: learningGoal,
-                additionalComments: additionalComments || ''
+                courseTopic: courseTopicInput.value.trim(),
+                subjectArea: subjectAreaInput.value.trim(),
+                knowledgeLevel: knowledgeLevelInput.value.trim(),
+                learningGoal: learningGoalInput.value.trim(),
+                additionalComments: additionalCommentsInput.value.trim()
             };
             
-            // Отправляем данные обратно в Telegram бот
-            tg.sendData(JSON.stringify(formData));
+            // Показываем статус отправки
+            statusElement.textContent = 'Отправка данных...';
+            statusElement.className = 'success';
             
-            // Показываем сообщение об успешной отправке
-            statusElem.textContent = 'Данные успешно отправлены!';
-            statusElem.className = 'success';
+            // Блокируем кнопку на время отправки
+            tg.MainButton.disable();
+            tg.MainButton.setText('Отправка...');
             
-            // Опционально: можно закрыть Mini App через некоторое время
-            setTimeout(() => {
-                tg.close();
-            }, 2000);
+            try {
+                // Отправка данных боту
+                tg.sendData(JSON.stringify(formData));
+                
+                // Сообщаем об успешной отправке
+                statusElement.textContent = 'Данные успешно отправлены!';
+                
+                // Закрываем приложение через 1.5 секунды
+                setTimeout(() => {
+                    tg.close();
+                }, 1500);
+            } catch (error) {
+                console.error('Ошибка при отправке данных:', error);
+                
+                // Восстанавливаем кнопку
+                tg.MainButton.enable();
+                tg.MainButton.setText('Отправить');
+                
+                // Показываем ошибку
+                statusElement.textContent = 'Ошибка при отправке данных. Попробуйте еще раз.';
+                statusElement.className = 'error';
+            }
         });
     </script>
 </body>
