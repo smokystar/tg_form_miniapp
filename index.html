@@ -8,234 +8,83 @@
     <title>Форма курса</title>
     <style>
         body {
-            --bg-color: var(--tg-theme-bg-color, #1c222b);
-            --text-color: var(--tg-theme-text-color, #ffffff);
-            --hint-color: var(--tg-theme-hint-color, #7d8699);
-            --link-color: var(--tg-theme-link-color, #6ab2f2);
-            --button-color: var(--tg-theme-button-color, #5288c1);
-            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
-            --secondary-bg-color: var(--tg-theme-secondary-bg-color, #131820);
-            
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-size: 16px;
+            font-family: sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
             margin: 0;
-            padding: 0;
-        }
-
-        .container {
             padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
-            box-sizing: border-box;
         }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--link-color);
-            text-transform: uppercase;
-        }
-
-        .form-hint {
-            display: block;
-            font-size: 14px;
-            color: var(--hint-color);
-            margin-top: 5px;
-        }
-
-        .form-input {
+        
+        input, textarea {
             width: 100%;
-            background-color: var(--secondary-bg-color);
-            color: var(--text-color);
-            border: none;
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-size: 16px;
-            box-sizing: border-box;
-            margin-bottom: 8px;
-            outline: none;
-        }
-
-        textarea.form-input {
-            min-height: 100px;
-            resize: none;
-        }
-
-        .form-input::placeholder {
-            color: var(--hint-color);
-        }
-
-        .form-input.error {
-            border: 1px solid #e74c3c;
-        }
-
-        #status {
-            margin-top: 15px;
             padding: 10px;
+            margin-bottom: 15px;
             border-radius: 8px;
-            display: none;
+            border: 1px solid var(--tg-theme-hint-color);
+            background-color: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            box-sizing: border-box;
         }
-
-        #status.success {
-            background-color: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
+        
+        label {
             display: block;
+            margin-bottom: 5px;
+            color: var(--tg-theme-link-color);
+            font-weight: bold;
         }
-
-        #status.error {
-            background-color: rgba(244, 67, 54, 0.2);
-            color: #F44336;
-            display: block;
+        
+        textarea {
+            height: 100px;
+            resize: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="form-group">
-            <div class="form-label">ТЕМА КУРСА</div>
-            <input type="text" class="form-input" id="courseTopic" placeholder="Введите текст" required>
-            <div class="form-hint">Напишите тему, которую вы бы хотели изучить</div>
-        </div>
-
-        <div class="form-group">
-            <div class="form-label">ПРЕДМЕТНАЯ ОБЛАСТЬ</div>
-            <input type="text" class="form-input" id="subjectArea" placeholder="Введите текст" required>
-            <div class="form-hint">Укажите область необходимых знаний, к примеру, курс по теории вероятности может применяться для математических задач, для экономических задач или для программирования</div>
-        </div>
-
-        <div class="form-group">
-            <div class="form-label">УРОВЕНЬ ЗНАНИЙ</div>
-            <input type="text" class="form-input" id="knowledgeLevel" placeholder="Введите ответ" required>
-            <div class="form-hint">Укажите необходимый уровень сложности курса</div>
-        </div>
-
-        <div class="form-group">
-            <div class="form-label">ЦЕЛЬ ОБУЧЕНИЯ</div>
-            <input type="text" class="form-input" id="learningGoal" placeholder="Введите ответ" required>
-            <div class="form-hint">Укажите для каких целей вам нужен курс, например, для личного развития / для решения рабочих задач</div>
-        </div>
-
-        <div class="form-group">
-            <div class="form-label">ДОПОЛНИТЕЛЬНЫЕ КОММЕНТАРИИ</div>
-            <textarea class="form-input" id="additionalComments" placeholder="Введите текст" rows="4"></textarea>
-            <div class="form-hint">Необязательное поле</div>
-        </div>
-
-        <div id="status"></div>
+    <div>
+        <label for="courseTopic">ТЕМА КУРСА</label>
+        <input type="text" id="courseTopic" placeholder="Введите тему курса">
+        
+        <label for="subjectArea">ПРЕДМЕТНАЯ ОБЛАСТЬ</label>
+        <input type="text" id="subjectArea" placeholder="Введите предметную область">
+        
+        <label for="knowledgeLevel">УРОВЕНЬ ЗНАНИЙ</label>
+        <input type="text" id="knowledgeLevel" placeholder="Введите уровень знаний">
+        
+        <label for="learningGoal">ЦЕЛЬ ОБУЧЕНИЯ</label>
+        <input type="text" id="learningGoal" placeholder="Введите цель обучения">
+        
+        <label for="additionalComments">ДОПОЛНИТЕЛЬНЫЕ КОММЕНТАРИИ</label>
+        <textarea id="additionalComments" placeholder="Введите комментарии"></textarea>
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
+        // Самый простой скрипт без лишних проверок
         const tg = window.Telegram.WebApp;
-        
-        // Расширяем и говорим, что страница готова
         tg.expand();
         tg.ready();
         
-        // Настраиваем главную кнопку 
-        tg.MainButton.setText('Отправить');
+        // Настраиваем кнопку
+        tg.MainButton.setText('ОТПРАВИТЬ');
         tg.MainButton.show();
         
-        // Элементы формы
-        const courseTopicInput = document.getElementById('courseTopic');
-        const subjectAreaInput = document.getElementById('subjectArea');
-        const knowledgeLevelInput = document.getElementById('knowledgeLevel');
-        const learningGoalInput = document.getElementById('learningGoal');
-        const additionalCommentsInput = document.getElementById('additionalComments');
-        const statusElement = document.getElementById('status');
-        
-        // Проверка обязательных полей при вводе
-        const requiredInputs = document.querySelectorAll('.form-input[required]');
-        requiredInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                this.classList.remove('error');
-                checkFormValidity();
-            });
-        });
-        
-        // Проверка валидности формы (включение/отключение кнопки)
-        function checkFormValidity() {
-            let isValid = true;
-            requiredInputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                }
-            });
-            
-            if (isValid) {
-                tg.MainButton.enable();
-            } else {
-                tg.MainButton.disable();
-            }
-        }
-        
-        // Инициальная проверка формы
-        checkFormValidity();
-        
-        // Обработчик нажатия на главную кнопку
+        // Обработчик нажатия кнопки
         tg.MainButton.onClick(function() {
-            // Проверяем форму снова
-            let isValid = true;
-            requiredInputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('error');
-                }
-            });
-            
-            if (!isValid) {
-                statusElement.textContent = 'Пожалуйста, заполните все обязательные поля';
-                statusElement.className = 'error';
-                return;
-            }
-            
-            // Собираем данные формы
-            const formData = {
-                courseTopic: courseTopicInput.value.trim(),
-                subjectArea: subjectAreaInput.value.trim(),
-                knowledgeLevel: knowledgeLevelInput.value.trim(),
-                learningGoal: learningGoalInput.value.trim(),
-                additionalComments: additionalCommentsInput.value.trim()
+            // Собираем данные
+            const data = {
+                courseTopic: document.getElementById('courseTopic').value || 'Не указано',
+                subjectArea: document.getElementById('subjectArea').value || 'Не указано',
+                knowledgeLevel: document.getElementById('knowledgeLevel').value || 'Не указано',
+                learningGoal: document.getElementById('learningGoal').value || 'Не указано',
+                additionalComments: document.getElementById('additionalComments').value || ''
             };
             
-            // Показываем статус отправки
-            statusElement.textContent = 'Отправка данных...';
-            statusElement.className = 'success';
+            // Отправляем данные и закрываем приложение
+            tg.sendData(JSON.stringify(data));
             
-            // Блокируем кнопку на время отправки
-            tg.MainButton.disable();
-            tg.MainButton.setText('Отправка...');
-            
-            try {
-                // Отправка данных боту
-                tg.sendData(JSON.stringify(formData));
-                
-                // Сообщаем об успешной отправке
-                statusElement.textContent = 'Данные успешно отправлены!';
-                
-                // Закрываем приложение через 1.5 секунды
-                setTimeout(() => {
-                    tg.close();
-                }, 1500);
-            } catch (error) {
-                console.error('Ошибка при отправке данных:', error);
-                
-                // Восстанавливаем кнопку
-                tg.MainButton.enable();
-                tg.MainButton.setText('Отправить');
-                
-                // Показываем ошибку
-                statusElement.textContent = 'Ошибка при отправке данных. Попробуйте еще раз.';
-                statusElement.className = 'error';
-            }
+            // Через короткое время закрываем приложение
+            setTimeout(function() {
+                tg.close();
+            }, 500);
         });
     </script>
 </body>
